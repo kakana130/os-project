@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Banker's Algorithm Visualizer</title>
+    <style>
+         :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #3b82f6;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 16px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+        
+        .card h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+        
+        .form-group {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        
+        input[type="number"],
+        select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            background: var(--accent);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+        }
+        
+        .btn.secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+        
+        .btn.secondary:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        
+        th {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        td {
+            padding: 6px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        td input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 4px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        td input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .matrix-wrap {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 20px;
+            margin-top: 16px;
+        }
+        
+        .matrix {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .result {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .result h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .safe-sequence {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .unsafe {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        
+        .step-log {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+            font-family: monospace;
+            margin-top: 12px;
+            line-height: 1.8;
+        }
+        
+        .step-item {
+            padding: 4px 0;
+            color: var(--muted);
+        }
+        
+        .step-success {
+            color: var(--success);
+        }
+        
+        .step-danger {
+            color: var(--danger);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 1000px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .matrix-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Banker's Algorithm Visualizer</h1>
+            <p class="subtitle">Deadlock Avoidance Algorithm - Safety Check</p>
+        </header>
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <h2>System Configuration</h2>
+                    <div class="form-group">
+                        <label>Number of Processes (n)</label>
+                        <input id="numProc" type="number" min="1" max="10" value="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Resources (m)</label>
+                        <input id="numRes" type="number" min="1" max="5" value="0" />
+                    </div>
+                    <div class="btn-group">
+                        <button id="generateBtn" class="btn">Generate Random</button>
+                        <button id="resetBtn" class="btn secondary">Clear All</button>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 20px">
+                    <h2>Available Resources</h2>
+                    <div id="availableInputs"></div>
+                    <button id="checkBtn" class="btn" style="margin-top: 14px">Check Safety Status</button>
+                </div>
+            </div>
+            <div class="content">
+                <div class="matrix-wrap">
+                    <h2>Resource Allocation Tables</h2>
+                    <div class="matrix-grid">
+                        <div class="matrix">
+                            <h3>Allocation Matrix</h3>
+                            <table id="allocationInputTable"></table>
+                        </div>
+                        <div class="matrix">
+                            <h3>Maximum Matrix</h3>
+                            <table id="maximumInputTable"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="matrix-wrap">
+                    <h2>Computed Matrices</h2>
+                    <div class="matrix-grid">
+                        <div class="matrix">
+                            <h3>Need Matrix</h3>
+                            <table id="needTable"></table>
+                        </div>
+                        <div class="matrix">
+                            <h3>Work Matrix</h3>
+                            <table id="workTable"></table>
+                        </div>
+                        <div class="matrix">
+                            <h3>Finish Status</h3>
+                            <table id="finishTable"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="result hidden" id="resultCard">
+                    <h2>Safety Analysis Result</h2>
+                    <div id="resultContent"></div>
+                    <div class="step-log" id="stepLog"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
